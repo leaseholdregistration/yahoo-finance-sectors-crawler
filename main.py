@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 import pytz
 import webbrowser
-
+import os
 
 sectors = [
     "technology",
@@ -112,6 +112,8 @@ def update_time_and_status():
 def open_url(event):
     webbrowser.open_new("https://finance.yahoo.com/sectors")
 
+def open_folder():
+    os.startfile(os.getcwd())
 
 # GUI 설정
 root = tk.Tk()
@@ -131,13 +133,17 @@ status_label.grid(row=1, column=0, columnspan=2, padx=10, pady=5)
 button_fetch = tk.Button(frame, text="데이터 가져오기", command=fetch_data)
 button_fetch.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
+# 저장 폴더 열기 버튼
+button_open_folder = tk.Button(frame, text="저장 폴더 열기", command=open_folder)
+button_open_folder.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+
 # 로딩바
 progress_bar = ttk.Progressbar(frame, orient="horizontal", length=300, mode="determinate")
-progress_bar.grid(row=3, column=0, columnspan=2, pady=10)
+progress_bar.grid(row=4, column=0, columnspan=2, pady=10)
 
 # Yahoo Finance 링크
 link = tk.Label(frame, text="Go to Yahoo Finance Sectors", fg="blue", cursor="hand2")
-link.grid(row=4, column=0, columnspan=2, pady=10)
+link.grid(row=5, column=0, columnspan=2, pady=10)
 link.bind("<Button-1>", open_url)
 
 update_time_and_status()
