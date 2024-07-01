@@ -1,12 +1,12 @@
+import os
 import tkinter as tk
 from tkinter import messagebox, ttk
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from datetime import datetime
 import pytz
 import webbrowser
-import os
+from openpyxl import Workbook
 
 sectors = [
     "technology",
@@ -72,13 +72,18 @@ def fetch_data():
         button_fetch.config(state=tk.NORMAL)
         return
 
-    df = pd.DataFrame(all_data)
+    # openpyxl을 사용하여 데이터 엑셀 파일로 저장
+    wb = Workbook()
+    ws = wb.active
+
+    # 열 헤더 추가
+    ws.append(["page"] + [sector['page'] for sector in all_data])
+    ws.append(["sector"] + [sector['sector'] for sector in all_data])
+    ws.append(["change"] + [sector['change'] for sector in all_data])
 
     today_date = datetime.today().strftime('%Y-%m-%d')
     file_name = f"output_{today_date}.xlsx"
-
-    df = df.T  # Transpose the DataFrame
-    df.to_excel(file_name, index=False, header=False)
+    wb.save(file_name)
 
     messagebox.showinfo("완료", f"데이터를 엑셀 파일로 저장했습니다: {file_name}")
     progress_bar["value"] = 0
