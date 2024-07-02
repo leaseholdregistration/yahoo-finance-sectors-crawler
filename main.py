@@ -1,12 +1,12 @@
+import os
 import tkinter as tk
 from tkinter import messagebox, ttk
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from datetime import datetime
 import pytz
 import webbrowser
-import os
+from openpyxl import Workbook
 
 sectors = [
     "technology",
@@ -25,7 +25,7 @@ sectors = [
 
 def fetch_data():
     base_url = "https://finance.yahoo.com/sectors/{}"
-    all_data = []
+    all_data = {sector: [] for sector in sectors}
 
     # 로딩바 초기화
     progress_bar["value"] = 0
@@ -61,24 +61,39 @@ def fetch_data():
         for link in sector_links:
             sector_name = link.find('div', class_='ticker-div').text.strip()
             percent_change = link.find('div', class_='percent-div').text.strip()
-            all_data.append({'page': sector, 'sector': sector_name, 'change': percent_change})
+            all_data[sector].append((sector_name, percent_change))
 
-        # 로딩바
+        # 데이터 정렬: sector_name 기준으로 정렬
+        all_data[sector].sort(key=lambda x: x[0])
+
+        # 로딩바 업데이트
         progress_bar["value"] += 1
         root.update_idletasks()
 
-    if not all_data:
+    if not any(all_data.values()):
         messagebox.showinfo("데이터 없음", "데이터를 찾을 수 없습니다.")
         button_fetch.config(state=tk.NORMAL)
         return
 
-    df = pd.DataFrame(all_data)
+    # openpyxl을 사용하여 데이터 엑셀 파일로 저장
+    wb = Workbook()
+    ws = wb.active
+
+    # 열 헤더 추가
+    headers = ["page"] + [sector for sector in sectors for _ in all_data[sector]]
+    ws.append(headers)
+
+    # sector 행 추가
+    sector_row = ["sector"] + [sector_name for sector in sectors for sector_name, _ in all_data[sector]]
+    ws.append(sector_row)
+
+    # change 행 추가
+    change_row = ["change"] + [change for sector in sectors for _, change in all_data[sector]]
+    ws.append(change_row)
 
     today_date = datetime.today().strftime('%Y-%m-%d')
     file_name = f"output_{today_date}.xlsx"
-
-    df = df.T  # Transpose the DataFrame
-    df.to_excel(file_name, index=False, header=False)
+    wb.save(file_name)
 
     messagebox.showinfo("완료", f"데이터를 엑셀 파일로 저장했습니다: {file_name}")
     progress_bar["value"] = 0
