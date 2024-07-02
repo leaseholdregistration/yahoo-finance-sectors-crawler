@@ -25,7 +25,7 @@ sectors = [
 
 def fetch_data():
     base_url = "https://finance.yahoo.com/sectors/{}"
-    all_data = []
+    all_data = {sector: [] for sector in sectors}
 
     # 로딩바 초기화
     progress_bar["value"] = 0
@@ -61,13 +61,16 @@ def fetch_data():
         for link in sector_links:
             sector_name = link.find('div', class_='ticker-div').text.strip()
             percent_change = link.find('div', class_='percent-div').text.strip()
-            all_data.append({'page': sector, 'sector': sector_name, 'change': percent_change})
+            all_data[sector].append((sector_name, percent_change))
 
-        # 로딩바
+        # 데이터 정렬: sector_name 기준으로 정렬
+        all_data[sector].sort(key=lambda x: x[0])
+
+        # 로딩바 업데이트
         progress_bar["value"] += 1
         root.update_idletasks()
 
-    if not all_data:
+    if not any(all_data.values()):
         messagebox.showinfo("데이터 없음", "데이터를 찾을 수 없습니다.")
         button_fetch.config(state=tk.NORMAL)
         return
@@ -77,9 +80,16 @@ def fetch_data():
     ws = wb.active
 
     # 열 헤더 추가
-    ws.append(["page"] + [sector['page'] for sector in all_data])
-    ws.append(["sector"] + [sector['sector'] for sector in all_data])
-    ws.append(["change"] + [sector['change'] for sector in all_data])
+    headers = ["page"] + [sector for sector in sectors for _ in all_data[sector]]
+    ws.append(headers)
+
+    # sector 행 추가
+    sector_row = ["sector"] + [sector_name for sector in sectors for sector_name, _ in all_data[sector]]
+    ws.append(sector_row)
+
+    # change 행 추가
+    change_row = ["change"] + [change for sector in sectors for _, change in all_data[sector]]
+    ws.append(change_row)
 
     today_date = datetime.today().strftime('%Y-%m-%d')
     file_name = f"output_{today_date}.xlsx"
