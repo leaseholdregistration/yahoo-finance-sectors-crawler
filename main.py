@@ -28,6 +28,10 @@ def fetch_data():
     base_url = "https://finance.yahoo.com/sectors/{}"
     all_data = {sector: [] for sector in sectors}
 
+    headers = {
+        "Accept-Language": "en-US,en;q=0.9"
+    }
+
     # 로딩바 초기화
     progress_bar["value"] = 0
     progress_bar["maximum"] = len(sectors)
@@ -36,7 +40,7 @@ def fetch_data():
     for sector in sectors:
         url = base_url.format(sector)
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
         except requests.RequestException as e:
             messagebox.showerror("요청 오류", f"웹사이트에 접근할 수 없습니다. 오류: {e}")
