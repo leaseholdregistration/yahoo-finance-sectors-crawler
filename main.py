@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import pytz
+import re
 import webbrowser
 from openpyxl import Workbook
 
@@ -50,7 +51,9 @@ def fetch_data():
             root.update_idletasks()
             continue
 
-        sector_links = heatmap_container.find_all('a', class_='none-link fin-size-medium svelte-wdkn18')
+        # 정규 표현식을 사용하여 동적 클래스 네임 처리
+        pattern = re.compile(r'none-link fin-size-medium svelte-\w+')
+        sector_links = heatmap_container.find_all('a', class_=pattern)
 
         if not sector_links:
             messagebox.showinfo("데이터 없음", f"{sector} 페이지에서 데이터를 찾을 수 없습니다.")
