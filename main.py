@@ -56,7 +56,13 @@ def fetch_data():
             continue
 
         # 정규 표현식을 사용하여 동적 클래스 네임 처리
-        pattern = re.compile(r'none-link fin-size-medium svelte-\w+')
+        # pattern = re.compile(r'none-link fin-size-medium svelte-\w+')
+        # sector_links = heatmap_container.find_all('a', class_=pattern)
+
+        # 'none-link'와 'fin-size-medium' 클래스를 포함하는 요소 찾기
+        pattern = re.compile(r'none-link.*fin-size-medium|fin-size-medium.*none-link')
+
+        # 패턴에 맞는 a 태그 찾기
         sector_links = heatmap_container.find_all('a', class_=pattern)
 
         if not sector_links:
