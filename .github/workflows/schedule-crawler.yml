@@ -1,0 +1,29 @@
+name: Schedule Python Crawler
+
+on:
+  schedule:
+    - cron: '30 21 * * *'  # 매일 오전 6시 30분 (한국 시간 기준)
+  workflow_dispatch:       # 수동 실행 추가
+
+jobs:
+  run-crawler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 openpyxl pytz
+
+      - name: Run Python script
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python main.py
