@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from openpyxl import Workbook
 
+# List of sectors to scrape
 sectors = [
     "technology",
     "financial-services",
@@ -30,21 +31,21 @@ def fetch_data():
             response = requests.get(url, headers=headers)
             response.raise_for_status()
         except requests.RequestException as e:
-            print(f"요청 오류: {e}")
+            print(f"Request error: {e}")
             return
 
         soup = BeautifulSoup(response.content, "html.parser")
         heatmap_container = soup.find('div', class_='heatMap-container')
         if not heatmap_container:
-            print(f"{sector} 페이지에서 heatMap-container를 찾을 수 없습니다.")
+            print(f"Could not find 'heatMap-container' on the {sector} page.")
             continue
 
-        # 패턴에 맞는 a 태그 찾기
+        # Find 'a' tags matching the pattern
         pattern = re.compile(r'none-link.*fin-size-medium|fin-size-medium.*none-link')
         sector_links = heatmap_container.find_all('a', class_=pattern)
 
         if not sector_links:
-            print(f"{sector} 페이지에서 데이터를 찾을 수 없습니다.")
+            print(f"No data found on the {sector} page.")
             continue
 
         for link in sector_links:
@@ -52,26 +53,26 @@ def fetch_data():
             percent_change = link.find('div', class_='percent-div').text.strip()
             all_data[sector].append((sector_name, percent_change))
 
-        # 데이터 정렬: sector_name 기준으로 정렬
+        # Sort data by sector_name
         all_data[sector].sort(key=lambda x: x[0])
 
     if not any(all_data.values()):
-        print("데이터를 찾을 수 없습니다.")
+        print("No data was found.")
         return
 
-    # 엑셀 파일로 저장
+    # Save data to an Excel file
     wb = Workbook()
     ws = wb.active
 
-    # 열 헤더 추가
+    # Add column headers
     headers = ["page"] + [sector for sector in sectors for _ in all_data[sector]]
     ws.append(headers)
 
-    # sector 행 추가
+    # Add sector row
     sector_row = ["sector"] + [sector_name for sector in sectors for sector_name, _ in all_data[sector]]
     ws.append(sector_row)
 
-    # change 행 추가
+    # Add change row
     change_row = ["change"] + [change for sector in sectors for _, change in all_data[sector]]
     ws.append(change_row)
 
@@ -79,7 +80,7 @@ def fetch_data():
     file_name = f"output_{today_date}.xlsx"
     wb.save(file_name)
 
-    print(f"데이터를 엑셀 파일로 저장했습니다: {file_name}")
+    print(f"Data has been saved to an Excel file: {file_name}")
     return file_name
 
 def send_email(file_path):
@@ -94,22 +95,22 @@ def send_email(file_path):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = recipient
-    msg['Subject'] = '크롤링 데이터 결과'
+    msg['Subject'] = 'Crawling Data Result'
 
-    # 엑셀 파일 첨부
+    # Attach the Excel file
     with open(file_path, 'rb') as file:
         attachment = MIMEApplication(file.read(), _subtype="xlsx")
         attachment.add_header('Content-Disposition', 'attachment', filename=file_path)
         msg.attach(attachment)
 
-    # 이메일 발송
+    # Send email
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
     server.send_message(msg)
     server.quit()
 
-    print("이메일이 발송되었습니다.")
+    print("Email has been sent successfully.")
 
 if __name__ == "__main__":
     excel_file = fetch_data()
