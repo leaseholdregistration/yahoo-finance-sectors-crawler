@@ -1,12 +1,13 @@
 # Yahoo Finance Sectors Crawler
 
-A Python-based data crawler that retrieves 'Day Return' values for 11 sectors and 145 industries from Yahoo Finance, organizes the data into an Excel file, and sends it via email. The GUI functionality has been deprecated in the latest version.
+A Python-based data crawler that retrieves 'Day Return' values for 11 sectors and 145 industries from Yahoo Finance, organizes the data into an Excel file, and sends it via email.
+> **Note:** The GUI functionality has been deprecated in the latest version.
 If you prefer using the GUI program, please check v2.2.1 in the Release tab.
 
 ## Features
 - Fetches 'Day Return' values for 11 sectors and 145 industries from Yahoo Finance.
-  - Saves data into an Excel file (`.xlsx`) with headers for page, sector names, and percentage changes.
-  > **Note:** The file will not be saved locally when the workflow runs on GitHub Actions. It will be temporarily generated in the GitHub Actions environment and will be deleted once the workflow execution completes. If you run the code locally, the file will be saved in your local directory.
+- Saves data into an Excel file (`.xlsx`) with headers for page, sector names, and percentage changes.
+> **Note:** The file will not be saved locally when the workflow runs on GitHub Actions. It will be temporarily generated in the GitHub Actions environment and will be deleted once the workflow execution completes. If you run the code locally, however, the file will be saved in your local directory.
 - Automatically sends the Excel file via email.
 
 ## Setup Instructions
