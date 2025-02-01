@@ -79,5 +79,5 @@ cron: '0 6 * * *'
 ### 4. Run the Workflow Manually (Optional)
 If you want to test the workflow without waiting for the scheduled `cron` time:
 1. Go to the **Actions** tab in your GitHub repository.
-2. Select the action named **"Schedule Python Crawler"**.
+2. Choose the action you want to run.
 3. Click the **"Run workflow"** button to trigger the workflow immediately.
