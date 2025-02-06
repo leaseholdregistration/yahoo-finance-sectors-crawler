@@ -35,7 +35,7 @@ For Gmail, you must use an **App Password**, not your regular email password. Fo
 3. Assign a name like **"crawler"** to the application and generate an App Password.
 4. Google will provide a 16-character App Password. Use this password as the value for `EMAIL_PASSWORD`.
 
-### 3. Set Up the Workflow
+### 3. Set Up the Workflow (Automated Email Dispatch)
 To automate the script and receive daily updates, configure the workflow file as follows:
 
 1. Navigate to `.github/workflows/schedule-crawler.yml`.
@@ -75,8 +75,18 @@ To run at **8:00 AM Greek time (UTC+2)**:
 cron: '0 6 * * *'
 ```
 
+### 4. Set Up the Workflow (Keep GitHub Actions Active) (Optional)
+This workflow prevents GitHub Actions from being disabled due to 60 days of inactivity by making periodic dummy commits.
 
-### 4. Run the Workflow Manually (Optional)
+To configure the workflow, first navigate to the `keep-alive` workflow file and update the cron schedule.
+
+The recommended setting is:
+```yaml
+cron: '0 0 1 * *'
+```
+This schedules a commit on the 1st day of every month to keep the repository active.
+
+### 5. Run the Workflow Manually (Optional)
 If you want to test the workflow without waiting for the scheduled `cron` time:
 1. Go to the **Actions** tab in your GitHub repository.
 2. Choose the action you want to run.
