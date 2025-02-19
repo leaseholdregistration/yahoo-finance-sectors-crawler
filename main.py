@@ -23,7 +23,10 @@ sectors = [
 def fetch_data():
     base_url = "https://finance.yahoo.com/sectors/{}"
     all_data = {sector: [] for sector in sectors}
-    headers = {"Accept-Language": "en-US,en;q=0.9"}
+    headers = {
+        "Accept-Language": "en-US,en;q=0.9",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+    }
 
     for sector in sectors:
         url = base_url.format(sector)
