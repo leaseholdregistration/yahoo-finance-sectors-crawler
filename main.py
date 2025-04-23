@@ -44,21 +44,20 @@ def fetch_data():
             print(f"Could not find 'heatMap-container' on the {sector} page.")
             continue
 
-        # Find 'a' tags matching the pattern
-        pattern = re.compile(r'none-link.*fin-size-medium|fin-size-medium.*none-link')
-        sector_links = heatmap_container.find_all('a', class_=pattern)
-
-        if not sector_links:
+        boxes = heatmap.find_all("div", class_="rect-container")
+        if not boxes:
             print(f"No data found on the {sector} page.")
             continue
+        
+         for box in boxes:
+            ticker_div = box.find("div", class_="ticker-div")
+            percent_div = box.find("div", class_="percent-div")
+            if ticker_div and percent_div:
+                sector_name = ticker_div.text.strip()
+                percent_change = percent_div.text.strip()
+                all_data[sector].append((sector_name, percent_change))
 
-        for link in sector_links:
-            sector_name = link.find('div', class_='ticker-div').text.strip()
-            percent_change = link.find('div', class_='percent-div').text.strip()
-            all_data[sector].append((sector_name, percent_change))
-
-        # Sort data by sector_name
-        all_data[sector].sort(key=lambda x: x[0])
+        all_data[sector].sort(key=lambda x: x[0])       
 
     if not any(all_data.values()):
         print("No data was found.")
