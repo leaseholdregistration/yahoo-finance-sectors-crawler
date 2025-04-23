@@ -7,6 +7,7 @@ from openpyxl import Workbook
 
 # List of sectors to scrape
 sectors = [
+    "",
     "technology",
     "financial-services",
     "healthcare",
@@ -68,7 +69,7 @@ def fetch_data():
     ws = wb.active
 
     # Add column headers
-    headers = ["page"] + [sector for sector in sectors for _ in all_data[sector]]
+    headers = ["page"] + [("all" if sector == "" else sector) for sector in sectors for _ in all_data[sector]]
     ws.append(headers)
 
     # Add sector row
